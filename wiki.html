@@ -7,7 +7,7 @@
 		<title>Wikipedia widget.</title>
 
 		<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
-		
+
 		<link rel="stylesheet" href="wiki.css" />
 		<script type="text/javascript" src="wiki.js"></script>
 	</head>
@@ -18,21 +18,20 @@
 			<button id="search-button" class="btn btn-default">Search</button>
 			<button id="random-button" class="btn btn-default">Random</button>
 		</div>
-		<div class="results">		
+		<div class="results hidden-start">
 		</div>
-		<div class="navigation-links">
+		<div class="navigation-links hidden-start">
 			<div id="previous"><</div> <div id="next">></div>
 		</div>
-		<p class="credits">
+		<div class="footer">
 			by <a class="link" href="http://www.freecodecamp.com/romorin">romorin</a> -
 			powered by <a class="link" href="https://wikimediafoundation.org">Wikimedia</a><br/>
-		</p>
-		
-		<div id="result-template">
-			<div class="result">
-				<p class="title"></p>		
-				<p class="content"></p>
-			</div>
 		</div>
 	</body>
+	<div id="result-template">
+		<div class="result">
+			<p class="title"></p>
+			<p class="content"></p>
+		</div>
+	</div>
 </html>

@@ -2,9 +2,10 @@ body {
 	background-color: #607d8b;
 	color: #ffffff;
 	font-size: 16px;
+	margin-bottom:50px;
 }
 
-#result-template {
+#result-template, .hidden-start {
 	display: none;
 }
 
@@ -43,9 +44,15 @@ body {
 	margin: 0 20px;
 }
 
-.credits {
+.footer {
 	text-align: center;
 	font-size: 0.7rem;
+
+	position:fixed;
+	height:50px;
+	width: 100%;
+	bottom:0px;
+	padding-top: 20px;
 }
 
 /*
