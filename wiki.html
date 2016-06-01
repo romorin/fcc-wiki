@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<!-- 	freeCodeCamp quote challenge -->
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Wikipedia widget.</title>
+
+		<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+		
+		<link rel="stylesheet" href="wiki.css" />
+		<script type="text/javascript" src="wiki.js"></script>
+	</head>
+	<body>
+		<div class="header">Learn!</div>
+		<div class="action-bar">
+			<input type="text" name="search-keyword" id="search-keyword" placeholder="About">
+			<button id="search-button" class="btn btn-default">Search</button>
+			<button id="random-button" class="btn btn-default">Random</button>
+		</div>
+		<div class="results">		
+		</div>
+		<div class="navigation-links">
+			<div id="previous"><</div> <div id="next">></div>
+		</div>
+		<p class="credits">
+			by <a class="link" href="http://www.freecodecamp.com/romorin">romorin</a> -
+			powered by <a class="link" href="https://wikimediafoundation.org">Wikimedia</a><br/>
+		</p>
+		
+		<div id="result-template">
+			<div class="result">
+				<p class="title"></p>		
+				<p class="content"></p>
+			</div>
+		</div>
+	</body>
+</html>
