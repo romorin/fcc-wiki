@@ -4,7 +4,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Wikipedia widget.</title>
+		<title>Learn!</title>
 
 		<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
 
@@ -14,9 +14,9 @@
 	<body>
 		<div class="header">Learn!</div>
 		<div class="action-bar">
-			<input type="text" name="search-keyword" id="search-keyword" placeholder="About">
-			<button id="search-button" class="btn btn-default">Search</button>
-			<button id="random-button" class="btn btn-default">Random</button>
+			<input class="input" type="text" name="search-keyword" id="search-keyword" placeholder="About">
+			<button id="search-button" class="btn">Search</button>
+			<button class="btn" onClick="location.href = 'https://en.wikipedia.org/wiki/Special:Random'">Random</a>
 		</div>
 		<div class="results hidden-start">
 		</div>

@@ -74,3 +74,27 @@ body {
 	color: red;
 	text-decoration: none;
 }
+
+
+
+.btn {
+  -webkit-border-radius: 7;
+  -moz-border-radius: 7;
+  border-radius: 7px;
+  color: #ffffff;
+  background: #707070;
+  padding: 5px 20px 5px 20px;
+  border: solid #303030 1px;
+  text-decoration: none;
+}
+.input {
+  color: #ffffff;
+  background: #707070;
+  padding: 6px 20px 6px 20px;
+  border: solid #303030 1px;
+  text-decoration: none;
+}
+.btn:hover {
+  background: #828282;
+  text-decoration: none;
+}
