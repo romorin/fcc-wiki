@@ -1,30 +1,23 @@
 //action=query&format=json&prop=&list=search&continue=&srsearch=new+york&srprop=snippet&sroffset=10&srlimit=10
 //&continue=&srsearch=new+york
-API_URL = "https://en.wikipedia.org/w/api.php?";
-QUERY_URL = "action=query&format=json&";
-LIST_URL = "prop=&list=search&srprop=snippet&srlimit=10&srsearch=";
-GET_TITLE_URL = "titles=";
-OFFSET_URL = "&sroffset=";
+var WIKI_URL = "https://en.wikipedia.org/";
+var API_URL = "w/api.php?";
+var QUERY_URL = "action=query&format=json&";
+var LIST_URL = "prop=&list=search&srprop=snippet&srlimit=10&srsearch=";
+var GET_TITLE_URL = "titles=";
+var OFFSET_URL = "&sroffset=";
+var CURID_URL = "?curid=";
+
+var PRE_CURID_URL = [WIKI_URL, CURID_URL].join('');
+var PRE_LIST_URL = [WIKI_URL, API_URL, QUERY_URL, LIST_URL].join('');
+var PRE_TITLE_URL = [WIKI_URL, API_URL, QUERY_URL, GET_TITLE_URL].join('');
 
 var createUrlGetter = function () { return new TestListUrlGetter(); };
-
-var TEST_TITLE_JSON = {
-    "batchcomplete": "",
-    "query": {
-        "pages": {
-            "645042": {
-                "pageid": 645042,
-                "ns": 0,
-                "title": "New York City"
-            }
-        }
-    }
-};
+var createTitleGetter = function () { return new TestTitleUrlGetter(); };
 
 // interface to get list data
 var ListUrlGetter = (function () {
-	function ListUrlGetter() {
-	}
+	function ListUrlGetter() {}
 
 	ListUrlGetter.prototype.fetch = function(keyword, offset, handler) {};
 
@@ -34,7 +27,7 @@ var ListUrlGetter = (function () {
 // get data from the api
 var RealListUrlGetter = (function () {
 	function generateQueryUrl(keyword, offset) {
-		var url = [API_URL, QUERY_URL, LIST_URL, encodeURIComponent(keyword)];
+		var url = [PRE_LIST_URL, encodeURIComponent(keyword)];
 
 		if (this._offset > 0) {
 			url.push(OFFSET_URL);
@@ -46,7 +39,6 @@ var RealListUrlGetter = (function () {
 	function RealListUrlGetter() {
 		ListUrlGetter.call();
 	}
-
 	RealListUrlGetter.prototype = Object.create(ListUrlGetter.prototype);
 	RealListUrlGetter.prototype.constructor = RealListUrlGetter;
 
@@ -138,22 +130,79 @@ var TestListUrlGetter = (function () {
 	return TestListUrlGetter;
 })();
 
+// interface to get title
+var TitleUrlGetter = (function () {
+	function TitleUrlGetter() {}
 
+	TitleUrlGetter.prototype.fetch = function(title, handler) {};
 
+	return TitleUrlGetter;
+})();
 
-var WikiLink= (function () {
-	function WikiLink(title) {
-		this._title = title;
+// get data from the api
+var RealTitleUrlGetter = (function () {
+	function generateQueryUrl(title) {
+		// todo handle spaces to + ?
+		return [PRE_TITLE_URL, encodeURIComponent(title)].join('');
 	}
+
+	function RealTitleUrlGetter() {
+		TitleUrlGetter.call();
+	}
+	RealTitleUrlGetter.prototype = Object.create(TitleUrlGetter.prototype);
+	RealTitleUrlGetter.prototype.constructor = RealTitleUrlGetter;
+
+	RealTitleUrlGetter.prototype.fetch = function(title, handler) {
+		return jQuery.getJSON(generateQueryUrl(title), handler);
+	};
+
+	return RealTitleUrlGetter;
+})();
+
+// get data for testing
+var TestTitleUrlGetter = (function () {
+	var TEST_TITLE_JSON = {
+	    "batchcomplete": "",
+	    "query": {
+	        "pages": {
+	            "645042": {
+	                "pageid": 645042,
+	                "ns": 0,
+	                "title": "New York City"
+	            }
+	        }
+	    }
+	};
+
+	function TestTitleUrlGetter() {
+		TitleUrlGetter.call();
+	}
+
+	TestTitleUrlGetter.prototype = Object.create(TitleUrlGetter.prototype);
+	TestTitleUrlGetter.prototype.constructor = TestTitleUrlGetter;
+
+	TestTitleUrlGetter.prototype.fetch = function(title, handler) {
+		return handler(TEST_TITLE_JSON);
+	};
+
+	return TestTitleUrlGetter;
 })();
 
 var WikiPageHander = (function () {
-	function handleClick(event) {
-		var title = encodeURIComponent(event.target.find(".title").html());
-		var url = [API_URL, QUERY_URL, LIST_URL, title].join('');
+	function displayArticle(json) {
+		// todo validation
+		var pageId = Object.keys(json.query.pages)[0];
+
+		window.location.href = [PRE_CURID_URL, pageId].join('');
 	}
 
+	function handleClick(event) {
+		var title = jQuery(event.target).find(".title").html();
+		this._titleUrlGetter.fetch(title, displayArticle.bind(this));
+	};
+
 	function displaySearchResults(json) {
+		// todo validation
 		var resJson = json.query.search;
 		var resContainer = jQuery(".results");
 		var resTemplate = jQuery(".result-template > div");
@@ -165,12 +214,11 @@ var WikiPageHander = (function () {
 
 			copy.find(".title").html(resJson[i].title);
 			copy.find(".content").html(resJson[i].snippet);
-			copy.on("click", handleClick);
+			copy.on("click", handleClick.bind(this));
 
 			if (i > 0) {
 				resContainer.append("<hr/>");
 			}
-
 			resContainer.append(copy);
 		}
 
@@ -181,12 +229,13 @@ var WikiPageHander = (function () {
 	function WikiPageHander() {
 		this._offset = 0;
 		this._listUrlGetter = createUrlGetter();
+		this._titleUrlGetter = createTitleGetter();
 	}
 
 	WikiPageHander.prototype.onSearch = function() {
 		var keyword = jQuery("#search-keyword").val();
 		if (keyword !== "") {
-			this._listUrlGetter.fetch(keyword, this._offset, displaySearchResults);
+			this._listUrlGetter.fetch(keyword, this._offset, displaySearchResults.bind(this));
 		}
 	};
 
