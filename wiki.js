@@ -1,5 +1,11 @@
+/*********************************************************
+	Configuration
+*********************************************************/
+
 //action=query&format=json&prop=&list=search&continue=&srsearch=new+york&srprop=snippet&sroffset=10&srlimit=10
 //&continue=&srsearch=new+york
+
+// api url parts
 var WIKI_URL = "https://en.wikipedia.org/";
 var API_URL = "w/api.php?";
 var QUERY_URL = "action=query&format=json&";
@@ -12,10 +18,18 @@ var PRE_CURID_URL = [WIKI_URL, CURID_URL].join('');
 var PRE_LIST_URL = [WIKI_URL, API_URL, QUERY_URL, LIST_URL].join('');
 var PRE_TITLE_URL = [WIKI_URL, API_URL, QUERY_URL, GET_TITLE_URL].join('');
 
+
+// Api handler configuration
 var createUrlGetter = function () { return new TestListUrlGetter(); };
 var createTitleGetter = function () { return new TestTitleUrlGetter(); };
 
+/*********************************************************
+	List Api handlers
+*********************************************************/
+
+/////////////////////////////////////////////////////////
 // interface to get list data
+
 var ListUrlGetter = (function () {
 	function ListUrlGetter() {}
 
@@ -24,7 +38,9 @@ var ListUrlGetter = (function () {
 	return ListUrlGetter;
 })();
 
+/////////////////////////////////////////////////////////
 // get data from the api
+
 var RealListUrlGetter = (function () {
 	function generateQueryUrl(keyword, offset) {
 		var url = [PRE_LIST_URL, encodeURIComponent(keyword)];
@@ -49,7 +65,9 @@ var RealListUrlGetter = (function () {
 	return RealListUrlGetter;
 })();
 
+/////////////////////////////////////////////////////////
 // get data for testing
+
 var TestListUrlGetter = (function () {
 	var TEST_LIST_JSON = {
 	    "batchcomplete": "",
@@ -130,7 +148,13 @@ var TestListUrlGetter = (function () {
 	return TestListUrlGetter;
 })();
 
+/*********************************************************
+	Title Api handlers
+*********************************************************/
+
+/////////////////////////////////////////////////////////
 // interface to get title
+
 var TitleUrlGetter = (function () {
 	function TitleUrlGetter() {}
 
@@ -139,7 +163,9 @@ var TitleUrlGetter = (function () {
 	return TitleUrlGetter;
 })();
 
+/////////////////////////////////////////////////////////
 // get data from the api
+
 var RealTitleUrlGetter = (function () {
 	function generateQueryUrl(title) {
 		// todo handle spaces to + ?
@@ -159,7 +185,9 @@ var RealTitleUrlGetter = (function () {
 	return RealTitleUrlGetter;
 })();
 
+/////////////////////////////////////////////////////////
 // get data for testing
+
 var TestTitleUrlGetter = (function () {
 	var TEST_TITLE_JSON = {
 	    "batchcomplete": "",
@@ -187,6 +215,10 @@ var TestTitleUrlGetter = (function () {
 
 	return TestTitleUrlGetter;
 })();
+
+/*********************************************************
+	Page handler
+*********************************************************/
 
 var WikiPageHander = (function () {
 	function displayArticle(json) {
@@ -249,6 +281,10 @@ var WikiPageHander = (function () {
 
 	return WikiPageHander;
 })();
+
+/*********************************************************
+	jQuery bindings
+*********************************************************/
 
 var PAGE_HANDLER = new WikiPageHander();
 
