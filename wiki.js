@@ -16,14 +16,14 @@ var OFFSET_URL = "&sroffset=";
 var GET_TITLE_URL = "&titles=";
 var CURID_URL = "?curid=";
 
-var PRE_CURID_URL = [WIKI_URL, CURID_URL].join('');
-var PRE_LIST_URL = [WIKI_URL, API_URL, QUERY_URL, LIST_URL, LIST_STEP, SEARCH_URL].join('');
-var PRE_TITLE_URL = [WIKI_URL, API_URL, QUERY_URL, GET_TITLE_URL].join('');
+var PRE_CURID_URL = WIKI_URL + CURID_URL;
+var PRE_LIST_URL = WIKI_URL + API_URL + QUERY_URL + LIST_URL + LIST_STEP + SEARCH_URL;
+var PRE_TITLE_URL = WIKI_URL + API_URL + QUERY_URL + GET_TITLE_URL;
 
 
 // Api handler configuration
-var createUrlGetter = function () { return new TestListUrlGetter(); };
-var createTitleGetter = function () { return new TestTitleUrlGetter(); };
+var createUrlGetter = function () { return new RealListUrlGetter(); };
+var createTitleGetter = function () { return new RealTitleUrlGetter(); };
 
 /*********************************************************
 	List Api handlers
@@ -45,13 +45,12 @@ var ListUrlGetter = (function () {
 
 var RealListUrlGetter = (function () {
 	function generateQueryUrl(keyword, offset) {
-		var url = [PRE_LIST_URL, encodeURIComponent(keyword)];
+		var url = PRE_LIST_URL + encodeURIComponent(keyword);
 
 		if (offset > 0) {
-			url.push(OFFSET_URL);
-			url.push(offset);
+			url += OFFSET_URL + offset;
 		}
-		return url.join('');
+		return url;
 	}
 
 	function RealListUrlGetter() {
@@ -171,7 +170,7 @@ var TitleUrlGetter = (function () {
 var RealTitleUrlGetter = (function () {
 	function generateQueryUrl(title) {
 		// todo handle spaces to + ?
-		return [PRE_TITLE_URL, encodeURIComponent(title)].join('');
+		return PRE_TITLE_URL + encodeURIComponent(title);
 	}
 
 	function RealTitleUrlGetter() {
@@ -227,7 +226,7 @@ var WikiPageHander = (function () {
 		// todo validation
 		var pageId = Object.keys(json.query.pages)[0];
 
-		window.location.href = [PRE_CURID_URL, pageId].join('');
+		window.location.href = PRE_CURID_URL + pageId;
 	}
 
 	function handleClick(event) {
