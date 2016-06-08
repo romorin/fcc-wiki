@@ -23,16 +23,34 @@ body {
   display: inline-block;
   text-align: left;
 }
+
 .results {
 	background-color: #ffffff;
 	color: #212121;
 	margin: 0 auto;
-	padding: 20px;
 	width: 90%;
+	padding: 10px;
+}
+.results > div {
+	padding: 20px;
+	cursor: pointer;
+
+}
+.results > hr {
+	margin: 10px 10%;
+}
+.hovering-result {
+	background-color: #cfd8dc;
+}
+.title {
+	font-size: 1.5rem;
+	font-weight: bold;
+	margin-bottom: 10px;
 }
 .content {
 	text-align: justify;
 }
+
 .navigation-links {
 	text-align: center;
 	color: #ffffff;
@@ -48,16 +66,19 @@ body {
 .navigation-links span {
 	cursor: pointer;
 }
+.hovering-nav {
+	color: pink;
+}
 
 .footer {
 	text-align: center;
 	font-size: 0.7rem;
 
 	position:fixed;
-	height:50px;
+	height:30px;
 	width: 100%;
 	bottom:0px;
-	padding-top: 20px;
+	padding-top: 15px;
 
 	background-color: inherit;
 }

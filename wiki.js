@@ -22,8 +22,8 @@ var PRE_TITLE_URL = WIKI_URL + API_URL + QUERY_URL + GET_TITLE_URL;
 
 
 // Api handler configuration
-var createUrlGetter = function () { return new RealListUrlGetter(); };
-var createTitleGetter = function () { return new RealTitleUrlGetter(); };
+var createUrlGetter = function () { return new TestListApiGetter(); };
+var createTitleGetter = function () { return new TestTitleApiGetter(); };
 
 /*********************************************************
 	List Api handlers
@@ -32,18 +32,18 @@ var createTitleGetter = function () { return new RealTitleUrlGetter(); };
 /////////////////////////////////////////////////////////
 // interface to get list data
 
-var ListUrlGetter = (function () {
-	function ListUrlGetter() {}
+var ListApiGetter = (function () {
+	function ListApiGetter() {}
 
-	ListUrlGetter.prototype.fetch = function(keyword, offset, handler) {};
+	ListApiGetter.prototype.fetch = function(keyword, offset, handler) {};
 
-	return ListUrlGetter;
+	return ListApiGetter;
 })();
 
 /////////////////////////////////////////////////////////
 // get data from the api
 
-var RealListUrlGetter = (function () {
+var RealListApiGetter = (function () {
 	function generateQueryUrl(keyword, offset) {
 		var url = PRE_LIST_URL + encodeURIComponent(keyword);
 
@@ -53,23 +53,23 @@ var RealListUrlGetter = (function () {
 		return url;
 	}
 
-	function RealListUrlGetter() {
-		ListUrlGetter.call();
+	function RealListApiGetter() {
+		ListApiGetter.call();
 	}
-	RealListUrlGetter.prototype = Object.create(ListUrlGetter.prototype);
-	RealListUrlGetter.prototype.constructor = RealListUrlGetter;
+	RealListApiGetter.prototype = Object.create(ListApiGetter.prototype);
+	RealListApiGetter.prototype.constructor = RealListApiGetter;
 
-	RealListUrlGetter.prototype.fetch = function(keyword, offset, handler) {
+	RealListApiGetter.prototype.fetch = function(keyword, offset, handler) {
 		return jQuery.getJSON(generateQueryUrl(keyword, offset), handler);
 	};
 
-	return RealListUrlGetter;
+	return RealListApiGetter;
 })();
 
 /////////////////////////////////////////////////////////
 // get data for testing
 
-var TestListUrlGetter = (function () {
+var TestListApiGetter = (function () {
 	var TEST_LIST_JSON = {
 	    "batchcomplete": "",
 	    "continue": {
@@ -135,18 +135,18 @@ var TestListUrlGetter = (function () {
 	    }
 	};
 
-	function TestListUrlGetter() {
-		ListUrlGetter.call();
+	function TestListApiGetter() {
+		ListApiGetter.call();
 	}
 
-	TestListUrlGetter.prototype = Object.create(ListUrlGetter.prototype);
-	TestListUrlGetter.prototype.constructor = TestListUrlGetter;
+	TestListApiGetter.prototype = Object.create(ListApiGetter.prototype);
+	TestListApiGetter.prototype.constructor = TestListApiGetter;
 
-	TestListUrlGetter.prototype.fetch = function(keyword, offset, handler) {
+	TestListApiGetter.prototype.fetch = function(keyword, offset, handler) {
 		return handler(TEST_LIST_JSON);
 	};
 
-	return TestListUrlGetter;
+	return TestListApiGetter;
 })();
 
 /*********************************************************
@@ -156,40 +156,40 @@ var TestListUrlGetter = (function () {
 /////////////////////////////////////////////////////////
 // interface to get title
 
-var TitleUrlGetter = (function () {
-	function TitleUrlGetter() {}
+var TitleApiGetter = (function () {
+	function TitleApiGetter() {}
 
-	TitleUrlGetter.prototype.fetch = function(title, handler) {};
+	TitleApiGetter.prototype.fetch = function(title, handler) {};
 
-	return TitleUrlGetter;
+	return TitleApiGetter;
 })();
 
 /////////////////////////////////////////////////////////
 // get data from the api
 
-var RealTitleUrlGetter = (function () {
+var RealTitleApiGetter = (function () {
 	function generateQueryUrl(title) {
 		// todo handle spaces to + ?
 		return PRE_TITLE_URL + encodeURIComponent(title);
 	}
 
-	function RealTitleUrlGetter() {
-		TitleUrlGetter.call();
+	function RealTitleApiGetter() {
+		TitleApiGetter.call();
 	}
-	RealTitleUrlGetter.prototype = Object.create(TitleUrlGetter.prototype);
-	RealTitleUrlGetter.prototype.constructor = RealTitleUrlGetter;
+	RealTitleApiGetter.prototype = Object.create(TitleApiGetter.prototype);
+	RealTitleApiGetter.prototype.constructor = RealTitleApiGetter;
 
-	RealTitleUrlGetter.prototype.fetch = function(title, handler) {
+	RealTitleApiGetter.prototype.fetch = function(title, handler) {
 		return jQuery.getJSON(generateQueryUrl(title), handler);
 	};
 
-	return RealTitleUrlGetter;
+	return RealTitleApiGetter;
 })();
 
 /////////////////////////////////////////////////////////
 // get data for testing
 
-var TestTitleUrlGetter = (function () {
+var TestTitleApiGetter = (function () {
 	var TEST_TITLE_JSON = {
 	    "batchcomplete": "",
 	    "query": {
@@ -203,25 +203,25 @@ var TestTitleUrlGetter = (function () {
 	    }
 	};
 
-	function TestTitleUrlGetter() {
-		TitleUrlGetter.call();
+	function TestTitleApiGetter() {
+		TitleApiGetter.call();
 	}
 
-	TestTitleUrlGetter.prototype = Object.create(TitleUrlGetter.prototype);
-	TestTitleUrlGetter.prototype.constructor = TestTitleUrlGetter;
+	TestTitleApiGetter.prototype = Object.create(TitleApiGetter.prototype);
+	TestTitleApiGetter.prototype.constructor = TestTitleApiGetter;
 
-	TestTitleUrlGetter.prototype.fetch = function(title, handler) {
+	TestTitleApiGetter.prototype.fetch = function(title, handler) {
 		return handler(TEST_TITLE_JSON);
 	};
 
-	return TestTitleUrlGetter;
+	return TestTitleApiGetter;
 })();
 
 /*********************************************************
-	Page handler
+	Search handler
 *********************************************************/
 
-var WikiPageHander = (function () {
+var WikiSearchHandler = (function () {
 	function displayArticle(json) {
 		// todo validation
 		var pageId = Object.keys(json.query.pages)[0];
@@ -229,9 +229,17 @@ var WikiPageHander = (function () {
 		window.location.href = PRE_CURID_URL + pageId;
 	}
 
-	function handleClick(event) {
+	function resultClick(event) {
 		var title = jQuery(event.currentTarget).find(".title").html();
 		this._titleUrlGetter.fetch(title, displayArticle.bind(this));
+	}
+
+	function resultHoverIn(event) {
+		jQuery(event.currentTarget).addClass('hovering-result');
+	}
+
+	function resultHoverOut(event) {
+		jQuery(event.currentTarget).removeClass('hovering-result');
 	}
 
 	function displayNavigation(noMoreResults) {
@@ -260,8 +268,9 @@ var WikiPageHander = (function () {
 			var copy = resTemplate.clone();
 
 			copy.find(".title").html(resJson[i].title);
-			copy.find(".content").html(resJson[i].snippet);
-			copy.on("click", handleClick.bind(this));
+			copy.find(".content").html(resJson[i].snippet + "...");
+			copy.on("click", resultClick.bind(this));
+			copy.hover(resultHoverIn.bind(this), resultHoverOut.bind(this));
 
 			if (i > 0) {
 				resContainer.append("<hr/>");
@@ -273,14 +282,14 @@ var WikiPageHander = (function () {
 		displayNavigation.call(this, i === 0);
 	}
 
-	function WikiPageHander() {
+	function WikiSearchHandler() {
 		this._offset = 0;
 		this._lastKeyword = "";
 		this._listUrlGetter = createUrlGetter();
 		this._titleUrlGetter = createTitleGetter();
 	}
 
-	WikiPageHander.prototype.onSearch = function() {
+	WikiSearchHandler.prototype.onSearch = function() {
 		var keyword = jQuery("#search-keyword").val();
 		if (keyword !== "") {
 			this._listUrlGetter.fetch(keyword, this._offset, displaySearchResults.bind(this));
@@ -288,7 +297,7 @@ var WikiPageHander = (function () {
 		}
 	};
 
-	WikiPageHander.prototype.onPrevious = function() {
+	WikiSearchHandler.prototype.onPrevious = function() {
 		this._offset -= LIST_STEP;
 		if (this._offset < 0) {
 			this._offset = 0;
@@ -296,26 +305,39 @@ var WikiPageHander = (function () {
 		this._listUrlGetter.fetch(this._lastKeyword, this._offset, displaySearchResults.bind(this));
 	};
 
-	WikiPageHander.prototype.onNext = function() {
+	WikiSearchHandler.prototype.onNext = function() {
 		this._offset += LIST_STEP;
 		this._listUrlGetter.fetch(this._lastKeyword, this._offset, displaySearchResults.bind(this));
 	};
 
-	return WikiPageHander;
+	return WikiSearchHandler;
 })();
 
 /*********************************************************
 	jQuery bindings
 *********************************************************/
 
-var PAGE_HANDLER = new WikiPageHander();
+function navHoverIn(event) {
+	jQuery(event.currentTarget).addClass('hovering-nav');
+}
+
+function navHoverOut(event) {
+	jQuery(event.currentTarget).removeClass('hovering-nav');
+}
+
+var PAGE_HANDLER = new WikiSearchHandler();
 
 // to be done when the page is ready
 jQuery(document).ready(function() {
 	// handle search button press
 	jQuery("#search-button").on("click", PAGE_HANDLER.onSearch.bind(PAGE_HANDLER));
-	jQuery("#previous").on("click", PAGE_HANDLER.onPrevious.bind(PAGE_HANDLER));
-	jQuery("#next").on("click", PAGE_HANDLER.onNext.bind(PAGE_HANDLER));
+	var previous = jQuery("#previous");
+	previous.on("click", PAGE_HANDLER.onPrevious.bind(PAGE_HANDLER));
+	previous.hover(navHoverIn, navHoverOut);
+
+	var next = jQuery("#next");
+	next.on("click", PAGE_HANDLER.onNext.bind(PAGE_HANDLER));
+	next.hover(navHoverIn, navHoverOut);
 
 	// handle input enter press
 	jQuery('#search-keyword').keydown(function(event) {
