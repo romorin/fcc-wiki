@@ -19,8 +19,8 @@ var PRE_TITLE_URL = WIKI_URL + API_URL + QUERY_URL + GET_TITLE_URL;
 
 
 // Api handler configuration
-var createUrlGetter = function () { return new TestListApiGetter(); };
-var createTitleGetter = function () { return new TestTitleApiGetter(); };
+var createUrlGetter = function () { return new RealListApiGetter(); };
+var createTitleGetter = function () { return new RealTitleApiGetter(); };
 
 /*********************************************************
 	List Api handlers
@@ -221,10 +221,18 @@ var TestTitleApiGetter = (function () {
 var WikiSearchHandler = (function () {
 	// called by the api getter to display the page from the title
 	function displayArticle(json) {
-		// todo validation
-		var pageId = Object.keys(json.query.pages)[0];
+		if (!('query' in json) || !('pages' in json.query)) {
+			alert("Received json without article id.");
+			return;
+		}
+		var keys = Object.keys(json.query.pages);
 
-		window.location.href = PRE_CURID_URL + pageId;
+		if (keys.length < 1) {
+			alert("Received json without article id.");
+			return;
+		}
+
+		window.location.href = PRE_CURID_URL + keys[0];
 	}
 
 	// called when the user click on a search result
@@ -259,7 +267,11 @@ var WikiSearchHandler = (function () {
 
 	// called by the api getter to display the results from a keyword
 	function displaySearchResults(json) {
-		// todo validation
+		if ( !('query' in json) || !('search' in json.query) ) {
+			alert("Received invalid search json.");
+			return;
+		}
+
 		var resJson = json.query.search;
 		var resContainer = jQuery(".results");
 		var resTemplate = jQuery(".result-template > div");
@@ -269,6 +281,11 @@ var WikiSearchHandler = (function () {
 
 		var i = 0;
 		for (; i < resJson.length; i++) {
+			// skip invalid result
+			if (!(resJson.hasOwnProperty(i)) || !('title' in resJson[i]) || !('snippet' in resJson[i])) {
+				continue;
+			}
+
 			// clone the template and fill the blanks
 			var copy = resTemplate.clone();
 			copy.find(".title").html(resJson[i].title);
@@ -288,7 +305,7 @@ var WikiSearchHandler = (function () {
 
 		// show stuff
 		resContainer.show();
-		displayNavigation.call(this, i === 0);
+		displayNavigation.call(this, i < LIST_STEP);
 	}
 
 	// ctr
