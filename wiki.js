@@ -2,9 +2,6 @@
 	Configuration
 *********************************************************/
 
-//action=query&format=json&prop=&list=search&continue=&srsearch=new+york&srprop=snippet&sroffset=10&srlimit=10
-//&continue=&srsearch=new+york
-
 // api url parts
 var WIKI_URL = "https://en.wikipedia.org/";
 var API_URL = "w/api.php?";
@@ -222,6 +219,7 @@ var TestTitleApiGetter = (function () {
 *********************************************************/
 
 var WikiSearchHandler = (function () {
+	// called by the api getter to display the page from the title
 	function displayArticle(json) {
 		// todo validation
 		var pageId = Object.keys(json.query.pages)[0];
@@ -229,19 +227,23 @@ var WikiSearchHandler = (function () {
 		window.location.href = PRE_CURID_URL + pageId;
 	}
 
+	// called when the user click on a search result
 	function resultClick(event) {
 		var title = jQuery(event.currentTarget).find(".title").html();
 		this._titleUrlGetter.fetch(title, displayArticle.bind(this));
 	}
 
+	// focus the result when the user hover over it.
 	function resultHoverIn(event) {
 		jQuery(event.currentTarget).addClass('hovering-result');
 	}
 
+	// removes the focus when the pointer leaves the result
 	function resultHoverOut(event) {
 		jQuery(event.currentTarget).removeClass('hovering-result');
 	}
 
+	// handle the display of the navigation arrows
 	function displayNavigation(noMoreResults) {
 		if (this._offset === 0) {
 			jQuery("#previous").hide();
@@ -255,33 +257,41 @@ var WikiSearchHandler = (function () {
 		}
 	}
 
+	// called by the api getter to display the results from a keyword
 	function displaySearchResults(json) {
 		// todo validation
 		var resJson = json.query.search;
 		var resContainer = jQuery(".results");
 		var resTemplate = jQuery(".result-template > div");
 
+		// flush old results
 		resContainer.empty();
 
 		var i = 0;
 		for (; i < resJson.length; i++) {
+			// clone the template and fill the blanks
 			var copy = resTemplate.clone();
-
 			copy.find(".title").html(resJson[i].title);
 			copy.find(".content").html(resJson[i].snippet + "...");
+
+			// handle mouse behaviour
 			copy.on("click", resultClick.bind(this));
 			copy.hover(resultHoverIn.bind(this), resultHoverOut.bind(this));
 
+			// bars between results
 			if (i > 0) {
 				resContainer.append("<hr/>");
 			}
+			// add result to results
 			resContainer.append(copy);
 		}
 
+		// show stuff
 		resContainer.show();
 		displayNavigation.call(this, i === 0);
 	}
 
+	// ctr
 	function WikiSearchHandler() {
 		this._offset = 0;
 		this._lastKeyword = "";
@@ -289,6 +299,7 @@ var WikiSearchHandler = (function () {
 		this._titleUrlGetter = createTitleGetter();
 	}
 
+	// called when the user want to display the pages corresponding to a keyword
 	WikiSearchHandler.prototype.onSearch = function() {
 		var keyword = jQuery("#search-keyword").val();
 		if (keyword !== "") {
@@ -297,6 +308,7 @@ var WikiSearchHandler = (function () {
 		}
 	};
 
+	// called when the user press the 'previous' navigation arrow
 	WikiSearchHandler.prototype.onPrevious = function() {
 		this._offset -= LIST_STEP;
 		if (this._offset < 0) {
@@ -305,6 +317,7 @@ var WikiSearchHandler = (function () {
 		this._listUrlGetter.fetch(this._lastKeyword, this._offset, displaySearchResults.bind(this));
 	};
 
+	// called when the user press the 'next' navigation arrow
 	WikiSearchHandler.prototype.onNext = function() {
 		this._offset += LIST_STEP;
 		this._listUrlGetter.fetch(this._lastKeyword, this._offset, displaySearchResults.bind(this));
@@ -331,6 +344,8 @@ var PAGE_HANDLER = new WikiSearchHandler();
 jQuery(document).ready(function() {
 	// handle search button press
 	jQuery("#search-button").on("click", PAGE_HANDLER.onSearch.bind(PAGE_HANDLER));
+
+	// handle navigation arrows
 	var previous = jQuery("#previous");
 	previous.on("click", PAGE_HANDLER.onPrevious.bind(PAGE_HANDLER));
 	previous.hover(navHoverIn, navHoverOut);
