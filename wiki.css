@@ -1,3 +1,7 @@
+/*
+	Base parts
+*/
+
 body {
 	background-color: #607d8b;
 	color: #ffffff;
@@ -9,6 +13,9 @@ body {
 	display: none;
 }
 
+/*
+	Main components
+*/
 .header {
 	font-size: 5rem;
 	margin-top: 100px;
@@ -23,7 +30,22 @@ body {
   display: inline-block;
   text-align: left;
 }
+.footer {
+	text-align: center;
+	font-size: 0.7rem;
 
+	position:fixed;
+	height:30px;
+	width: 100%;
+	bottom:0px;
+	padding-top: 15px;
+
+	background-color: inherit;
+}
+
+/*
+	Result listings
+*/
 .results {
 	background-color: #ffffff;
 	color: #212121;
@@ -51,6 +73,9 @@ body {
 	text-align: justify;
 }
 
+/*
+	Navigation links
+*/
 .navigation-links {
 	text-align: center;
 	color: #ffffff;
@@ -68,19 +93,6 @@ body {
 }
 .hovering-nav {
 	color: pink;
-}
-
-.footer {
-	text-align: center;
-	font-size: 0.7rem;
-
-	position:fixed;
-	height:30px;
-	width: 100%;
-	bottom:0px;
-	padding-top: 15px;
-
-	background-color: inherit;
 }
 
 /*
@@ -103,8 +115,9 @@ body {
 	text-decoration: none;
 }
 
-
-
+/*
+	Btn created with http://css3buttongenerator.com/
+*/
 .btn {
   -webkit-border-radius: 7;
   -moz-border-radius: 7;
