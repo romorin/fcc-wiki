@@ -8,14 +8,16 @@
 // api url parts
 var WIKI_URL = "https://en.wikipedia.org/";
 var API_URL = "w/api.php?";
-var QUERY_URL = "action=query&format=json&";
-var LIST_URL = "prop=&list=search&srprop=snippet&srlimit=10&srsearch=";
-var GET_TITLE_URL = "titles=";
+var QUERY_URL = "action=query&format=json&callback=?";
+var LIST_STEP = 10;
+var LIST_URL = "&prop=&list=search&srprop=snippet&srlimit=";
+var SEARCH_URL = "&srsearch=";
 var OFFSET_URL = "&sroffset=";
+var GET_TITLE_URL = "&titles=";
 var CURID_URL = "?curid=";
 
 var PRE_CURID_URL = [WIKI_URL, CURID_URL].join('');
-var PRE_LIST_URL = [WIKI_URL, API_URL, QUERY_URL, LIST_URL].join('');
+var PRE_LIST_URL = [WIKI_URL, API_URL, QUERY_URL, LIST_URL, LIST_STEP, SEARCH_URL].join('');
 var PRE_TITLE_URL = [WIKI_URL, API_URL, QUERY_URL, GET_TITLE_URL].join('');
 
 
@@ -45,9 +47,9 @@ var RealListUrlGetter = (function () {
 	function generateQueryUrl(keyword, offset) {
 		var url = [PRE_LIST_URL, encodeURIComponent(keyword)];
 
-		if (this._offset > 0) {
+		if (offset > 0) {
 			url.push(OFFSET_URL);
-			url.push(this._offset);
+			url.push(offset);
 		}
 		return url.join('');
 	}
@@ -229,9 +231,22 @@ var WikiPageHander = (function () {
 	}
 
 	function handleClick(event) {
-		var title = jQuery(event.target).find(".title").html();
+		var title = jQuery(event.currentTarget).find(".title").html();
 		this._titleUrlGetter.fetch(title, displayArticle.bind(this));
-	};
+	}
+
+	function displayNavigation(noMoreResults) {
+		if (this._offset === 0) {
+			jQuery("#previous").hide();
+		} else {
+			jQuery("#previous").show();
+		}
+		if (noMoreResults) {
+			jQuery("#next").hide();
+		} else {
+			jQuery("#next").show();
+		}
+	}
 
 	function displaySearchResults(json) {
 		// todo validation
@@ -241,7 +256,8 @@ var WikiPageHander = (function () {
 
 		resContainer.empty();
 
-		for (var i = 0; i < resJson.length; i++) {
+		var i = 0;
+		for (; i < resJson.length; i++) {
 			var copy = resTemplate.clone();
 
 			copy.find(".title").html(resJson[i].title);
@@ -255,11 +271,12 @@ var WikiPageHander = (function () {
 		}
 
 		resContainer.show();
-		jQuery(".navigation-links").show();
+		displayNavigation.call(this, i === 0);
 	}
 
 	function WikiPageHander() {
 		this._offset = 0;
+		this._lastKeyword = "";
 		this._listUrlGetter = createUrlGetter();
 		this._titleUrlGetter = createTitleGetter();
 	}
@@ -268,15 +285,21 @@ var WikiPageHander = (function () {
 		var keyword = jQuery("#search-keyword").val();
 		if (keyword !== "") {
 			this._listUrlGetter.fetch(keyword, this._offset, displaySearchResults.bind(this));
+			this._lastKeyword = keyword;
 		}
 	};
 
 	WikiPageHander.prototype.onPrevious = function() {
-
+		this._offset -= LIST_STEP;
+		if (this._offset < 0) {
+			this._offset = 0;
+		}
+		this._listUrlGetter.fetch(this._lastKeyword, this._offset, displaySearchResults.bind(this));
 	};
 
 	WikiPageHander.prototype.onNext = function() {
-
+		this._offset += LIST_STEP;
+		this._listUrlGetter.fetch(this._lastKeyword, this._offset, displaySearchResults.bind(this));
 	};
 
 	return WikiPageHander;
@@ -292,6 +315,8 @@ var PAGE_HANDLER = new WikiPageHander();
 jQuery(document).ready(function() {
 	// handle search button press
 	jQuery("#search-button").on("click", PAGE_HANDLER.onSearch.bind(PAGE_HANDLER));
+	jQuery("#previous").on("click", PAGE_HANDLER.onPrevious.bind(PAGE_HANDLER));
+	jQuery("#next").on("click", PAGE_HANDLER.onNext.bind(PAGE_HANDLER));
 
 	// handle input enter press
 	jQuery('#search-keyword').keydown(function(event) {

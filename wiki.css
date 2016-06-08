@@ -38,10 +38,15 @@ body {
 	color: #ffffff;
 	font-size: 2rem;
 	margin: 30px 0;
+	cursor: default;
 }
 .navigation-links > div {
 	display: inline-block;
 	margin: 0 20px;
+	width: 30px;
+}
+.navigation-links span {
+	cursor: pointer;
 }
 
 .footer {
