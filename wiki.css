@@ -24,11 +24,12 @@ body {
 .action-bar {
   text-align: center;
   margin-top: 50px;
-  margin-bottom: 30px;
 }
-.action-bar div {
-  display: inline-block;
-  text-align: left;
+.action-bar > * {
+	margin-bottom: 30px;
+}
+.buttons {
+	display: inline-block;
 }
 .footer {
 	text-align: center;
@@ -138,4 +139,10 @@ body {
 .btn:hover {
   background: #828282;
   text-decoration: none;
+}
+
+@media all and (max-width: 320px) {
+	.header {
+		font-size: 25vw;
+	}
 }
