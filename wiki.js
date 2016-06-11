@@ -374,7 +374,7 @@ jQuery(document).ready(function() {
 	// handle input enter press
 	jQuery('#search-keyword').keydown(function(event) {
 	  if(event.keyCode == '13') {
-	    PAGE_HANDLER.onActionClick();
+	    PAGE_HANDLER.onSearch.call(PAGE_HANDLER);
 	  }
 	});
 });
